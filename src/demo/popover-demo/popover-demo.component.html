@@ -1,0 +1,162 @@
+<div class="w-full h-full bg-[hsl(240_10%_3.9%)] p-4">
+  <h1 class="text-xl font-semibold mb-4 text-white">Popover Trigger Demo</h1>
+
+  <div class="flex space-x-4">
+    <!-- Click Trigger Example -->
+    <div class="bg-[hsl(240_10%_10%)] p-4 rounded shadow border border-[#333]">
+      <h2 class="font-medium mb-2 text-gray-200">Click Trigger</h2>
+      <app-popover [options]="{ trigger: 'click', position: 'bottom' }">
+        <button class="px-3 py-1 bg-blue-600 text-white rounded">
+          Click Me
+        </button>
+
+        <div popoverContent>
+          <div class="p-3 min-w-[150px] bg-[hsl(240_10%_10%)] text-white border border-[#333] rounded">
+            <h3 class="font-medium">Click Popover</h3>
+            <p class="text-sm text-gray-400 mt-1">Click outside to close</p>
+          </div>
+        </div>
+      </app-popover>
+    </div>
+
+    <!-- Hover Trigger Example -->
+    <div class="bg-[hsl(240_10%_10%)] p-4 rounded shadow border border-[#333]">
+      <h2 class="font-medium mb-2 text-gray-200">Hover Trigger</h2>
+      <app-popover [options]="{ trigger: 'hover', position: 'top' }">
+        <button class="px-3 py-1 bg-green-600 text-white rounded">
+          Hover Me
+        </button>
+
+        <div popoverContent>
+          <div class="p-3 min-w-[150px] bg-[hsl(240_10%_10%)] text-white border border-[#333] rounded">
+            <h3 class="font-medium">Hover Popover</h3>
+            <p class="text-sm text-gray-400 mt-1">Move mouse away to close</p>
+          </div>
+        </div>
+      </app-popover>
+    </div>
+
+    <!-- Hover with Delay Trigger Example -->
+    <div class="bg-[hsl(240_10%_10%)] p-4 rounded shadow border border-[#333]">
+      <h2 class="font-medium mb-2 text-gray-200">Hover with Delay</h2>
+      <app-popover [options]="{ trigger: 'hover', position: 'right', hoverRemoveDelay: 1000 }">
+        <button class="px-3 py-1 bg-purple-600 text-white rounded">
+          Hover (1s Delay)
+        </button>
+
+        <div popoverContent>
+          <div class="p-3 min-w-[150px] bg-[hsl(240_10%_10%)] text-white border border-[#333] rounded">
+            <h3 class="font-medium">Delayed Close</h3>
+            <p class="text-sm text-gray-400 mt-1">Closes 1 second after mouse leaves</p>
+          </div>
+        </div>
+      </app-popover>
+    </div>
+  </div>
+
+  <div class="mt-4 flex space-x-4">
+    <!-- Using with explicit template -->
+    <app-popover [options]="{ position: 'bottom', hasBackdrop: true }">
+      <button class="px-4 py-2 bg-blue-500 text-white rounded">Click me</button>
+
+      <ng-template #popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium">Popover Title</h3>
+          <p class="mt-2">This is the popover content.</p>
+        </div>
+      </ng-template>
+    </app-popover>
+
+    <!-- Using with content projection -->
+    <app-popover [options]="{ position: 'bottom' }">
+      <button class="px-4 py-2 bg-green-500 text-white rounded">Click for popover</button>
+
+      <div popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium">Popover Title</h3>
+          <p class="mt-2">This is the content inside the popover.</p>
+          <button class="mt-3 px-3 py-1 bg-red-500 text-white rounded text-sm">Action</button>
+        </div>
+      </div>
+    </app-popover>
+
+    <!-- No backdrop -->
+    <app-popover [options]="{ position: 'bottom', hasBackdrop: false }">
+      <button class="px-4 py-2 bg-yellow-500 text-white rounded">No backdrop</button>
+
+      <ng-template #popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium">No Backdrop</h3>
+          <p class="mt-2">This popover has no backdrop.</p>
+        </div>
+      </ng-template>
+    </app-popover>
+
+    <!-- Clickable backdrop -->
+    <app-popover [options]="{ position: 'bottom', blockInteraction: false }">
+      <button class="px-4 py-2 bg-purple-500 text-white rounded">Clickable backdrop</button>
+
+      <ng-template #popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium">Click Through</h3>
+          <p class="mt-2">You can click through this backdrop.</p>
+        </div>
+      </ng-template>
+    </app-popover>
+
+    <!-- Popover chỉ đóng khi bấm nút Close -->
+    <app-popover #customPopover
+      (functionControl)="handlerFunctionControl($event)"
+      [options]="{ position: 'bottom', disableClose: true, hasBackdrop: true }">
+      <button class="px-4 py-2 bg-orange-500 text-white rounded">
+        Chỉ đóng bằng nút Close
+      </button>
+
+      <div popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium">Popover Chỉ Đóng Bằng Nút Close</h3>
+          <p class="mt-2">Popover này không thể đóng khi bấm ra ngoài.</p>
+          <p class="mt-1 text-gray-600">Bạn phải bấm nút Close để đóng popover.</p>
+
+          <div class="mt-4 flex justify-end">
+            <button class="px-4 py-2 bg-red-500 text-white rounded text-sm"
+              (click)="handlerClosePopover($event)">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </app-popover>
+
+    <!-- Popover có mũi tên (mặc định) -->
+    <app-popover [options]="{ position: 'bottom', showArrow: true }">
+      <button class="px-4 py-2 bg-blue-500 text-white rounded">Có mũi tên</button>
+      <!-- popover content -->
+    </app-popover>
+
+    <!-- Popover không có mũi tên -->
+    <app-popover [options]="{ position: 'bottom', showArrow: false }">
+      <button class="px-4 py-2 bg-gray-500 text-white rounded">Không có mũi tên</button>
+      <!-- popover content -->
+    </app-popover>
+
+    <!-- Ví dụ cho popover với theme tối -->
+    <app-popover [options]="{ position: 'bottom', showArrow: true }">
+      <button class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded">Popover Tối</button>
+
+      <div popoverContent>
+        <div class="p-2">
+          <h3 class="text-lg font-medium mb-2">Tiêu đề Popover</h3>
+          <p class="mb-3">Đây là nội dung trong popover với theme tối.</p>
+          <div class="flex justify-between items-center pt-2 border-t border-gray-700">
+            <span class="text-sm text-gray-400">Thông tin bổ sung</span>
+            <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
+              Hành động
+            </button>
+          </div>
+        </div>
+      </div>
+    </app-popover>
+  </div>
+
+</div>

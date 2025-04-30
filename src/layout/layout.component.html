@@ -1,0 +1,13 @@
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <app-sidebar />
+
+  <!-- Main Content -->
+  <div class="flex-1 h-screen overflow-hidden">
+    <app-header />
+    <div class="h-full overflow-y-auto">
+      <!-- Header -->
+      <router-outlet />
+    </div>
+  </div>
+</div>

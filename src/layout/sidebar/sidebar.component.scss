@@ -1,0 +1,61 @@
+:host {
+  .submenu-container {
+    position: relative;
+
+    &[data-level="1"] {
+      &::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 5px;
+        bottom: 5px;
+        width: 1px;
+        background-color: #333;
+      }
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 5px;
+      bottom: 5px;
+      width: 1px;
+      background-color: #333;
+    }
+
+    .submenu-item-enter {
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          transition-delay: #{($i - 1) * 30}ms;
+        }
+      }
+    }
+  }
+
+  .submenu-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .menu-item {
+    position: relative;
+    transition: all 0.15s ease;
+
+    &:hover:not(.bg-blue-600) {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &.menu-item-active {
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  .rotate-enter {
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .rotate-clockwise {
+    transform: rotate(-180deg);
+  }
+}

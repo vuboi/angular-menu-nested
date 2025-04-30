@@ -1,0 +1,13 @@
+@use './assets/scss/font';
+@use './assets/scss/animation';
+@use './assets/scss/variable';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box !important;
+}
+
+/* You can add global styles to this file, and also import other style files */

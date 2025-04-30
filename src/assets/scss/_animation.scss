@@ -1,0 +1,268 @@
+@use "./variable" as *;
+
+@layer components {
+
+  /* Base grid-based animation class */
+  .slide-fade-enter {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: all var(--animation-duration) ease-out;
+    overflow: hidden;
+  }
+
+  /* Submenu states - Grid approach */
+  .slide-down {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide-up {
+    grid-template-rows: 0fr !important;
+    opacity: 0;
+    overflow: hidden;
+    transition: all var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: visible;
+    /* Ensure visibility during animation */
+  }
+
+  /* Only apply display:none after animation completes */
+  .invisible {
+    visibility: hidden;
+    transition: visibility 0s var(--animation-duration);
+    /* Delay visibility change until after animation */
+  }
+
+  /* Rotation animation */
+  .rotate-enter {
+    @apply transition-transform duration-300 ease-in-out;
+    will-change: transform;
+  }
+
+  .rotate-clockwise {
+    // transform: rotate(90deg);
+    transform: rotate(-180deg);
+  }
+
+  /* Hover transitions */
+  .hover-transition {
+    @apply transition-colors duration-300 ease-in-out;
+  }
+
+  /* Slide animations for UI components */
+  @keyframes slideInFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(var(--animation-distance));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--animation-distance)));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(var(--animation-distance));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(calc(-1 * var(--animation-distance)));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutToBottom {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+      transform-origin: top;
+    }
+
+    to {
+      opacity: 0;
+      transform: translateY(var(--animation-distance));
+      transform-origin: top;
+    }
+  }
+
+  @keyframes slideOutToTop {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--animation-distance)));
+    }
+  }
+
+  @keyframes slideOutToRight {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateX(var(--animation-distance));
+    }
+  }
+
+  @keyframes slideOutToLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateX(calc(-1 * var(--animation-distance)));
+    }
+  }
+
+  /* Unified movement animations - moves as a single unit */
+  @keyframes slideUnitToBottom {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateY(var(--animation-distance));
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideUnitToTop {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateY(calc(-1 * var(--animation-distance)));
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideUnitFromBottom {
+    from {
+      transform: translateY(var(--animation-distance));
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUnitFromTop {
+    from {
+      transform: translateY(calc(-1 * var(--animation-distance)));
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Reusable animation classes */
+  .animate-base {
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-timing);
+    animation-fill-mode: both;
+  }
+
+  /* Position-based animation classes */
+  .slide-in-bottom {
+    animation-name: slideInFromBottom;
+    @extend .animate-base;
+  }
+
+  .slide-in-top {
+    animation-name: slideInFromTop;
+    @extend .animate-base;
+  }
+
+  .slide-in-right {
+    animation-name: slideInFromRight;
+    @extend .animate-base;
+  }
+
+  .slide-in-left {
+    animation-name: slideInFromLeft;
+    @extend .animate-base;
+  }
+
+  .slide-out-bottom {
+    animation-name: slideOutToBottom;
+    @extend .animate-base;
+  }
+
+  .slide-out-top {
+    animation-name: slideOutToTop;
+    @extend .animate-base;
+  }
+
+  .slide-out-right {
+    animation-name: slideOutToRight;
+    @extend .animate-base;
+  }
+
+  .slide-out-left {
+    animation-name: slideOutToLeft;
+    @extend .animate-base;
+  }
+
+  /* Unit movement animation classes */
+  .slide-unit-to-bottom {
+    animation-name: slideUnitToBottom;
+    @extend .animate-base;
+  }
+
+  .slide-unit-to-top {
+    animation-name: slideUnitToTop;
+    @extend .animate-base;
+  }
+
+  .slide-unit-from-bottom {
+    animation-name: slideUnitFromBottom;
+    @extend .animate-base;
+  }
+
+  .slide-unit-from-top {
+    animation-name: slideUnitFromTop;
+    @extend .animate-base;
+  }
+}

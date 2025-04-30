@@ -1,0 +1,110 @@
+$font-family-poppins: 'Poppins', sans-serif;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+@mixin font-poppins {
+  font-family: $font-family-poppins !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin font-weight($weight) {
+  font-weight: $weight;
+}
+
+@mixin font-size($size) {
+  font-size: $size;
+}
+
+@mixin line-height($height) {
+  line-height: $height;
+}
+
+:root {
+  font-family: $font-family-poppins !important;
+  font-weight: $font-weight-regular;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.font-light {
+  @include font-weight($font-weight-light);
+}
+
+.font-regular {
+  @include font-weight($font-weight-regular);
+}
+
+.font-medium {
+  @include font-weight($font-weight-medium);
+}
+
+.font-semibold {
+  @include font-weight($font-weight-semibold);
+}
+
+.font-bold {
+  @include font-weight($font-weight-bold);
+}
+
+.text-xs {
+  @include font-size($font-size-xs);
+}
+
+.text-sm {
+  @include font-size($font-size-sm);
+}
+
+.text-base {
+  @include font-size($font-size-base);
+}
+
+.text-lg {
+  @include font-size($font-size-lg);
+}
+
+.text-xl {
+  @include font-size($font-size-xl);
+}
+
+.text-2xl {
+  @include font-size($font-size-2xl);
+}
+
+.text-3xl {
+  @include font-size($font-size-3xl);
+}
+
+.text-4xl {
+  @include font-size($font-size-4xl);
+}
+
+.leading-tight {
+  @include line-height($line-height-tight);
+}
+
+.leading-normal {
+  @include line-height($line-height-normal);
+}
+
+.leading-relaxed {
+  @include line-height($line-height-relaxed);
+}

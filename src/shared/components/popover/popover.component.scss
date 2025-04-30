@@ -1,0 +1,127 @@
+::ng-deep {
+  .popover-content {
+    @apply bg-[#222222] rounded-md shadow-lg py-2 px-3 border border-[#333] relative text-gray-200;
+    z-index: 1000;
+
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-timing);
+    animation-fill-mode: forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+
+    &.position-bottom {
+      animation-name: slideUnitFromBottom;
+
+      &.closing {
+        animation-name: slideUnitToBottom;
+      }
+    }
+
+    &.position-top {
+      animation-name: slideUnitFromTop;
+
+      &.closing {
+        animation-name: slideUnitToTop;
+      }
+    }
+
+    &.position-right {
+      animation-name: slideInFromRight;
+
+      &.closing {
+        animation-name: slideOutToRight;
+      }
+    }
+
+    &.position-left {
+      animation-name: slideInFromLeft;
+
+      &.closing {
+        animation-name: slideOutToLeft;
+      }
+    }
+
+    &.has-arrow .popover-arrow {
+      @apply absolute w-[8px] h-[8px] bg-[#222222] transform rotate-45;
+      border-width: 1px;
+      border-color: #333;
+      z-index: 999;
+    }
+
+    &.position-top .popover-arrow {
+      @apply bottom-[-4px] left-1/2 -translate-x-1/2;
+      border-top: 0;
+      border-left: 0;
+    }
+
+    &.position-right .popover-arrow {
+      @apply left-[-4px] top-1/2 -translate-y-1/2;
+      border-right: 0;
+      border-top: 0;
+    }
+
+    &.position-bottom .popover-arrow {
+      @apply top-[-4px] left-1/2 -translate-x-1/2;
+      border-bottom: 0;
+      border-right: 0;
+    }
+
+    &.position-left .popover-arrow {
+      @apply right-[-4px] top-1/2 -translate-y-1/2;
+      border-left: 0;
+      border-bottom: 0;
+    }
+
+    &.align-start {
+
+      &.position-top .popover-arrow,
+      &.position-bottom .popover-arrow {
+        @apply left-[20px] -translate-x-1/2;
+      }
+
+      &.position-left .popover-arrow,
+      &.position-right .popover-arrow {
+        @apply top-[20px] -translate-y-1/2;
+      }
+    }
+
+    &.align-end {
+
+      &.position-top .popover-arrow,
+      &.position-bottom .popover-arrow {
+        @apply left-[calc(100%-20px)] -translate-x-1/2;
+      }
+
+      &.position-left .popover-arrow,
+      &.position-right .popover-arrow {
+        @apply top-[calc(100%-20px)] -translate-y-1/2;
+      }
+    }
+
+    >* {
+      @apply relative z-[1001];
+    }
+
+    h3 {
+      @apply text-gray-100 font-medium;
+    }
+
+    p {
+      @apply text-gray-300;
+    }
+
+    button {
+      @apply hover:bg-gray-700 transition-colors;
+    }
+
+    .border-t {
+      @apply border-[#333];
+    }
+  }
+
+  .popover-click-through-backdrop {
+    pointer-events: none !important;
+  }
+}

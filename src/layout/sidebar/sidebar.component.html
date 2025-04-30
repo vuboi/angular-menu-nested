@@ -1,0 +1,179 @@
+<div class="relative h-full">
+  <div
+    class="h-full bg-[hsl(240_10%_3.9%)] border-r border-[#333] shadow-[2px_0_8px_0_rgba(0,0,0,0.25)] transition-all duration-200 ease-out overflow-hidden flex flex-col"
+    [class.w-[250px]]="!sideCollapsed()"
+    [class.w-16]="sideCollapsed()">
+    <div class="flex-1 relative menu-container">
+      <!-- Menu Item Template -->
+      <ng-template #menuItem let-menu>
+        <app-popover
+          [classContent]="'min-h-[50px] w-[250px]'"
+          [options]="popoverOptions()"
+          (functionControl)="handlerFunctionControl(menu.id, $event)">
+          <div popoverContent>
+            <!-- Recursive Menu Template for Popover -->
+            <ng-template #popoverRecursiveMenu let-item let-idx="index">
+              <div
+                class="mt-2 menu-item rounded-md h-9 flex items-center text-gray-400 hover:text-white cursor-pointer overflow-hidden group relative w-full hover:bg-[rgba(255,255,255,0.1)]"
+                [class.mt-2]="!(idx === 0 && item.level === 2)"
+                [class.bg-blue-600]="item.active"
+                [class.menu-item-active]="item.active"
+                [class.!text-white]="item.active"
+                [class.hover:bg-blue-600]="item.active"
+                [attr.data-level]="item.level"
+                (click)="handlerToggleSubMenu($event, item)">
+                <!-- Icon -->
+                <div class="w-12 flex items-center justify-center flex-shrink-0">
+                  <i-lucide [name]="item.icon"
+                    class="group-hover:text-white"
+                    size="18" />
+                </div>
+
+                <!-- Menu Name -->
+                <span
+                  class="whitespace-nowrap text-ellipsis text-sm font-medium overflow-hidden transition-[width] duration-150 group-hover:text-white pr-2">
+                  {{ item.name }}
+                </span>
+
+                <!-- Arrow Icon for Parent Menus -->
+                @if (item.children?.length) {
+                  <div class="ml-auto mr-2 flex items-center">
+                    <i-lucide [name]="chevronDownIcon"
+                      class="rotate-enter"
+                      [class.rotate-clockwise]="item.expanded"
+                      size="18" />
+                  </div>
+                }
+              </div>
+
+              <!-- Submenu Container -->
+              @if (item.children?.length) {
+                <!-- NOTE: [class.max-h-[1000px]]="item.expanded": Có thẻ tính toán ra số lượng menu child nested của menu parent rồi nhân với chiều cao của menu item -->
+                <div class="submenu-container ml-4 relative overflow-hidden transition-all duration-200 ease-in-out origin-top"
+                  [class.max-h-[1000px]]="item.expanded"
+                  [class.opacity-100]="item.expanded"
+                  [class.max-h-0]="!item.expanded"
+                  [class.opacity-0]="!item.expanded">
+                  <div class="border-line-vertical absolute left-[1px] top-[5px] bottom-[5px] w-[1px] bg-gray-600"></div>
+                  <div class="submenu-inner">
+                    @for (child of item.children; track child.id; let i = $index) {
+                      <div class="ml-2 relative">
+                        <ng-container *ngTemplateOutlet="popoverRecursiveMenu; context: { $implicit: child, index: i }">
+                        </ng-container>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </ng-template>
+
+            <!-- First level of menu items in popover -->
+            @if (menu.children?.length) {
+              <div class="popover-menu-container relative">
+                @for (child of menu.children; track child.id; let i = $index) {
+                  <div class="relative">
+                    <ng-container *ngTemplateOutlet="popoverRecursiveMenu; context: {
+                      $implicit: child,
+                      index: i
+                    }">
+                    </ng-container>
+                  </div>
+                }
+              </div>
+            } @else {
+              <ng-container *ngTemplateOutlet="popoverRecursiveMenu; context: { $implicit: menu, index: 0 }">
+              </ng-container>
+            }
+          </div>
+
+          <app-popover [options]="{ trigger: 'hover', position: 'right', disabledOpen: !sideCollapsed() }"
+            [classContent]="'w-fit'">
+            @if (sideCollapsed()) {
+              <div popoverContent>
+                <span
+                  class="whitespace-nowrap text-ellipsis text-sm font-medium overflow-hidden transition-[width] duration-150 group-hover:text-white"
+                  [class.w-0]="sideCollapsed()"
+                  [class.w-[168px]]="!sideCollapsed()">
+                  {{ menu.name }}
+                </span>
+              </div>
+            }
+            <div #menuItemRef
+              class="menu-item rounded-md mt-2 mx-2 h-9 flex items-center text-gray-400 hover:text-white cursor-pointer overflow-hidden group relative"
+              [class.bg-blue-600]="menu.active"
+              [class.menu-item-active]="menu.active"
+              [class.!text-white]="menu.active"
+              [class.hidden]="menu.hidden || sideCollapsed() && menu.level! > 1"
+              [attr.data-level]="menu.level"
+              (click)="handlerClickMenuItem($event, menu); handlerToggleMenuPopover($event, menu)">
+              <!-- Icon -->
+              <div class="w-12 flex items-center justify-center flex-shrink-0">
+                <i-lucide [name]="menu.icon"
+                  class="group-hover:text-white"
+                  size="18" />
+              </div>
+
+              <!-- Menu Name -->
+              @if (!this.sideCollapsed()) {
+                <span
+                  class="whitespace-nowrap text-ellipsis text-sm font-medium overflow-hidden transition-[width] duration-150 group-hover:text-white pr-2"
+                  [class.w-0]="sideCollapsed()"
+                  [class.w-[168px]]="!sideCollapsed()">
+                  {{ menu.name }}
+                </span>
+              }
+
+              <!-- Arrow Icon for Parent Menus -->
+              @if (menu.children?.length && !sideCollapsed()) {
+                <div class="ml-auto mr-2 flex items-center">
+                  <i-lucide [name]="chevronDownIcon"
+                    class="rotate-enter"
+                    [class.opacity-0]="sideCollapsed()"
+                    [class.rotate-clockwise]="menu.expanded"
+                    size="18" />
+                </div>
+              }
+            </div>
+          </app-popover>
+          <!-- Submenu Container -->
+          @if (menu.children?.length) {
+            <div class="submenu-container ml-4 slide-fade-enter"
+              [class.slide-down]="menu.expanded && !sideCollapsed()"
+              [class.slide-up]="(!menu.expanded || sideCollapsed()) && menu.children.length > 0"
+              [class.invisible]="menu.hidden && !menu.expanded"
+              [attr.data-level]="menu.level">
+              <div class="submenu-inner">
+                @for (child of menu.children; track child.id) {
+                  <div class="ml-2">
+                    <ng-container *ngTemplateOutlet="menuItem; context: { $implicit: child }">
+                    </ng-container>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </app-popover>
+      </ng-template>
+
+      <!-- Root Level Menu Items -->
+      @for (menu of menus(); track menu.id) {
+        @if (menu.level === 1) {
+          <ng-container *ngTemplateOutlet="menuItem; context: { $implicit: menu }">
+          </ng-container>
+        }
+      }
+    </div>
+
+    <!-- Collapse Toggle Button -->
+    <div class="py-4 w-full">
+      <div class="h-[50px] flex items-center transition-all duration-200 ease-out text-gray-400 hover:text-white cursor-pointer"
+        [class.justify-center]="sideCollapsed()"
+        [class.justify-end]="!sideCollapsed()"
+        [class.pr-5]="!sideCollapsed()"
+        (click)="handlerToggleSidebar($event)">
+        <i-lucide [name]="sideCollapsed() ? chevronsRightIcon : chevronsLeftIcon"
+          size="18" />
+      </div>
+    </div>
+  </div>
+</div>

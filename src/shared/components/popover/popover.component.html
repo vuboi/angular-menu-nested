@@ -1,0 +1,19 @@
+  <div
+    #popoverOrigin
+    [class]="'popover-origin ' + classOrigin()"
+    [style.zIndex]="options$().zIndex"
+    (click)="handlerTogglePopover($event)">
+    <ng-content></ng-content>
+  </div>
+
+  @if (!options$().disabledOpen) {
+    <ng-template #popoverContent>
+      <div class="popover-content" [class]="'position-' + options$().position + ' ' + (classContent() || 'min-h-[50px] min-w-[250px]')"
+        [style.zIndex]="options$().zIndex">
+        @if (options$().showArrow) {
+          <div class="popover-arrow"></div>
+        }
+        <ng-content select="[popoverContent]"></ng-content>
+      </div>
+    </ng-template>
+  }
