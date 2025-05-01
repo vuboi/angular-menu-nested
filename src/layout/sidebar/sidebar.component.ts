@@ -3,10 +3,12 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal }
 import { Router, RouterModule } from "@angular/router";
 import { ChevronDownIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, LucideAngularModule } from "lucide-angular";
 import { explicitEffect } from 'ngxtension/explicit-effect';
+import { uuid } from "src/shared/helpers";
 import { PopoverComponent } from "../../shared/components/popover";
 import { IPopoverFunctionControl, IPopoverOptions } from "../../shared/components/popover/interfaces";
 import { sidebarMenu } from "./defines/sidebar.define";
 import { IMenuItem } from "./interfaces/sidebar.interface";
+import { CalculatorMaxHeightSubMenuPipe } from "./pipes/calculator-max-height-sub-menu.pipe";
 
 @Component({
   selector: "app-sidebar",
@@ -19,6 +21,7 @@ import { IMenuItem } from "./interfaces/sidebar.interface";
     NgTemplateOutlet,
     LucideAngularModule,
     PopoverComponent,
+    CalculatorMaxHeightSubMenuPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -31,10 +34,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   protected readonly chevronDownIcon = ChevronDownIcon;
 
   protected popoverOptions = signal<IPopoverOptions>(this.getPopoverOptions());
-  protected sideCollapsed = signal<boolean>(false);
+  protected sideCollapsed = signal<boolean>(true);
   protected menus = signal<IMenuItem[]>(this.buildMenus());
   protected menuActive = signal<IMenuItem | undefined>(undefined);
   protected popoverControls = signal<Map<string, IPopoverFunctionControl>>(new Map());
+  protected keyFetchSubMenu = signal<string>('');
 
   private router = inject(Router);
 
@@ -240,6 +244,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   protected handlerToggleSubMenu(event: Event, child: IMenuItem): void {
     event.stopPropagation();
     this.handlerClickMenuItem(event, child);
+    this.keyFetchSubMenu.set(uuid());
   }
 
   private collapseAllSubmenus(items: IMenuItem[]): void {

@@ -14,6 +14,7 @@
             <!-- Recursive Menu Template for Popover -->
             <ng-template #popoverRecursiveMenu let-item let-idx="index">
               <div
+                #menuItemRefPopover
                 class="mt-2 menu-item rounded-md h-9 flex items-center text-gray-400 hover:text-white cursor-pointer overflow-hidden group relative w-full hover:bg-[rgba(255,255,255,0.1)]"
                 [class.mt-2]="!(idx === 0 && item.level === 2)"
                 [class.bg-blue-600]="item.active"
@@ -50,11 +51,9 @@
               @if (item.children?.length) {
                 <!-- NOTE: [class.max-h-[1000px]]="item.expanded": Có thẻ tính toán ra số lượng menu child nested của menu parent rồi nhân với chiều cao của menu item -->
                 <div class="submenu-container ml-4 relative overflow-hidden transition-all duration-200 ease-in-out origin-top"
-                  [class.max-h-[1000px]]="item.expanded"
-                  [class.opacity-100]="item.expanded"
-                  [class.max-h-0]="!item.expanded"
-                  [class.opacity-0]="!item.expanded">
-                  <div class="border-line-vertical absolute left-[1px] top-[5px] bottom-[5px] w-[1px] bg-gray-600"></div>
+                  [style.max-height.px]="item.expanded | calculatorMaxHeightSubMenu: item: keyFetchSubMenu()"
+                  [class.max-h-0]=" !item.expanded">
+                  <div class="border-line-vertical absolute left-[1px] top-[5px] bottom-[2px] w-[1px] bg-gray-600"></div>
                   <div class="submenu-inner">
                     @for (child of item.children; track child.id; let i = $index) {
                       <div class="ml-2 relative">
@@ -139,8 +138,6 @@
           @if (menu.children?.length) {
             <div class="submenu-container ml-4 slide-fade-enter"
               [class.slide-down]="menu.expanded && !sideCollapsed()"
-              [class.slide-up]="(!menu.expanded || sideCollapsed()) && menu.children.length > 0"
-              [class.invisible]="menu.hidden && !menu.expanded"
               [attr.data-level]="menu.level">
               <div class="submenu-inner">
                 @for (child of menu.children; track child.id) {
