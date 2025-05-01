@@ -44,7 +44,7 @@
     }
 
     &.has-arrow .popover-arrow {
-      @apply absolute w-[8px] h-[8px] bg-[#222222] transform rotate-45;
+      @apply absolute w-[8px] h-[8px] bg-[hsl(240_10%_10%)] transform rotate-45;
       border-width: 1px;
       border-color: #333;
       z-index: 999;

@@ -25,17 +25,17 @@ import { IMenuItem } from "./interfaces/sidebar.interface";
 
 export class SidebarComponent implements OnInit, OnDestroy {
   // TODO: Viết component tooltip dùng cho text bị cát ....
-  protected popoverOptions = signal<IPopoverOptions>(this.getPopoverOptions());
-
   protected readonly chevronsLeftIcon = ChevronsLeftIcon;
   protected readonly chevronsRightIcon = ChevronsRightIcon;
   protected readonly chevronRightIcon = ChevronRightIcon;
   protected readonly chevronDownIcon = ChevronDownIcon;
 
+  protected popoverOptions = signal<IPopoverOptions>(this.getPopoverOptions());
   protected sideCollapsed = signal<boolean>(false);
   protected menus = signal<IMenuItem[]>(this.buildMenus());
   protected menuActive = signal<IMenuItem | undefined>(undefined);
   protected popoverControls = signal<Map<string, IPopoverFunctionControl>>(new Map());
+
   private router = inject(Router);
 
   constructor() {
@@ -61,9 +61,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
         if (parent) {
           menu.parents = { ...parent.parents, [parent.id]: parent };
         }
+
         if (menu.children?.length) {
           menu.expanded = false;
         }
+
         menu.hidden = menu.level > 1;
         menusMap.push(menu);
         if (menu.children?.length) {

@@ -1,9 +1,9 @@
-<div class="relative h-full">
+<div class="relative h-screen">
   <div
     class="h-full bg-[hsl(240_10%_3.9%)] border-r border-[#333] shadow-[2px_0_8px_0_rgba(0,0,0,0.25)] transition-all duration-200 ease-out overflow-hidden flex flex-col"
     [class.w-[250px]]="!sideCollapsed()"
     [class.w-16]="sideCollapsed()">
-    <div class="flex-1 relative menu-container">
+    <div class="flex-1 relative menu-container overflow-y-auto">
       <!-- Menu Item Template -->
       <ng-template #menuItem let-menu>
         <app-popover

@@ -3,7 +3,7 @@ import { PortalModule, TemplatePortal } from "@angular/cdk/portal";
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, OnDestroy, OnInit, TemplateRef, ViewContainerRef, computed, inject, input, output, signal, viewChild } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { explicitEffect } from "ngxtension/explicit-effect";
-import { DEFAULT_POPOVER_OPTIONS, IPopoverFunctionControl, IPopoverOptions, TYPE_VERTICAL_ALIGNMENT } from "./interfaces";
+import { DEFAULT_POPOVER_OPTIONS, IPopoverFunctionControl, IPopoverOptions, TYPE_ARROW_ALIGNMENT, TYPE_VERTICAL_ALIGNMENT } from "./interfaces";
 
 @Component({
   selector: "app-popover",
@@ -24,9 +24,6 @@ export class PopoverComponent implements OnInit, OnDestroy {
   public closed = output<void>();
   public functionControl = output<IPopoverFunctionControl>();
 
-  private popoverOrigin = viewChild<ElementRef>('popoverOrigin');
-  private popoverContent = viewChild<TemplateRef<never>>('popoverContent');
-
   protected options$ = computed(() => ({ ...DEFAULT_POPOVER_OPTIONS, offset: this.getOffset(), ...this.options() }));
   private overlayRef = signal<OverlayRef | null>(null);
   private documentClickListener = signal<(() => void) | null>(null);
@@ -37,6 +34,8 @@ export class PopoverComponent implements OnInit, OnDestroy {
   private viewContainerRef = inject(ViewContainerRef);
   private destroyRef = inject(DestroyRef);
 
+  private popoverOrigin = viewChild<ElementRef>('popoverOrigin');
+  private popoverContent = viewChild<TemplateRef<never>>('popoverContent');
 
   constructor() {
     explicitEffect([this.overlayRef], ([overlayRef]) => {
@@ -90,22 +89,20 @@ export class PopoverComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.options$().trigger === 'hover') {
-      this.clearCloseTimeout();
-      if (!this.overlayRef()) {
-        this.doOpenPopover();
-      }
+    this.clearCloseTimeout();
+    if (!this.overlayRef()) {
+      this.doOpenPopover();
     }
   }
 
   @HostListener('mouseleave')
   onMouseLeave(): void {
-    if (this.closeTimeoutId !== null || this.options$().trigger !== 'hover'
-      || this.options$().disableClose || !this.overlayRef() || this.options$().disabledOpen) {
+    const { trigger, disableClose, disabledOpen, hoverRemoveDelay } = this.options$() || {};
+    if (this.closeTimeoutId !== null || trigger !== 'hover' || disableClose || disabledOpen || !this.overlayRef()) {
       return;
     }
 
-    const delay = this.options$().hoverRemoveDelay || 0;
+    const delay = hoverRemoveDelay || 0;
     if (delay > 0) {
       this.closeTimeoutId = setTimeout(() => {
         this.doClosePopover();
@@ -129,20 +126,20 @@ export class PopoverComponent implements OnInit, OnDestroy {
     if (this.overlayRef()) {
       return;
     }
-
+    const { trigger, hasBackdrop, content, disableClose, blockInteraction } = this.options$() || {};
     const positionStrategy = this.getPositionStrategy();
-    const backdropClass = this.options$().blockInteraction
+    const backdropClass = blockInteraction
       ? ['cdk-overlay-transparent-backdrop']
       : ['cdk-overlay-transparent-backdrop', 'popover-click-through-backdrop'];
 
     const newOverlayRef = this.overlay.create({
       positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
-      hasBackdrop: this.options$().hasBackdrop && this.options$().trigger === 'click',
+      hasBackdrop: hasBackdrop && trigger === 'click',
       backdropClass
     });
 
-    const template = this.options$().content || this.popoverContent();
+    const template = content || this.popoverContent();
     if (!template) {
       console.error('No template found for popover content');
       return;
@@ -153,13 +150,13 @@ export class PopoverComponent implements OnInit, OnDestroy {
     this.overlayRef.set(newOverlayRef);
     this.opened.emit();
 
-    if (this.options$().hasBackdrop && !this.options$().disableClose && this.options$().trigger === 'click') {
+    if (hasBackdrop && !disableClose && trigger === 'click') {
       newOverlayRef.backdropClick()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.doClosePopover());
     }
 
-    if ((!this.options$().hasBackdrop && !this.options$().disableClose && this.options$().trigger === 'click')) {
+    if ((!hasBackdrop && !disableClose && trigger === 'click')) {
       this.setupDocumentClickListener();
     }
   }
@@ -221,19 +218,19 @@ export class PopoverComponent implements OnInit, OnDestroy {
   }
 
   private setPopoverClasses(popoverElement: HTMLElement): void {
-    popoverElement.classList.add(`position-${this.options$().position}`);
+    const { position, showArrow, arrowAlignment } = this.options$() || {};
+    popoverElement.classList.add(`position-${position}`);
 
-    if (this.options$().showArrow) {
+    if (showArrow) {
       popoverElement.classList.add('has-arrow');
     }
 
-    const alignment = this.options$().arrowAlignment;
-    if (alignment === 'start') {
+    if (arrowAlignment === 'start') {
       popoverElement.classList.add('align-start');
       return;
     }
 
-    if (alignment === 'end') {
+    if (arrowAlignment === 'end') {
       popoverElement.classList.add('align-end');
       return;
     }
@@ -244,7 +241,6 @@ export class PopoverComponent implements OnInit, OnDestroy {
   private autoAdjustArrowAlignment(popoverElement: HTMLElement): void {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-
     const originElement = this.popoverOrigin()?.nativeElement;
     if (!originElement) {
       return;
@@ -280,7 +276,7 @@ export class PopoverComponent implements OnInit, OnDestroy {
   }
 
   private getOffset(): number {
-    const position = this.options().position;
+    const { position } = this.options() || {};
     if (position === 'top' || position === 'left') {
       return -8;
     }
@@ -291,12 +287,9 @@ export class PopoverComponent implements OnInit, OnDestroy {
   private getPositionStrategy(): FlexibleConnectedPositionStrategy {
     const positions: ConnectionPositionPair[] = [];
     const originElement = this.popoverOrigin()?.nativeElement || this.elementRef.nativeElement;
-    const alignment = this.options$().arrowAlignment;
-    const originX = alignment === 'start' ? 'start' : alignment === 'end' ? 'end' : 'center';
-    const overlayX = alignment === 'start' ? 'start' : alignment === 'end' ? 'end' : 'center';
-
-    const position = this.options$().position;
-
+    const { position, arrowAlignment, offset } = this.options$() || {};
+    const originX = arrowAlignment === 'start' ? 'start' : arrowAlignment === 'end' ? 'end' : 'center';
+    const overlayX = arrowAlignment === 'start' ? 'start' : arrowAlignment === 'end' ? 'end' : 'center';
     switch (position) {
       case 'top':
         positions.push({
@@ -304,7 +297,7 @@ export class PopoverComponent implements OnInit, OnDestroy {
           originY: 'top',
           overlayX,
           overlayY: 'bottom',
-          offsetY: this.options$().offset
+          offsetY: offset
         });
         break;
       case 'right':
@@ -313,7 +306,7 @@ export class PopoverComponent implements OnInit, OnDestroy {
           originY: this.getVerticalAlignmentToOverlayY(),
           overlayX: 'start',
           overlayY: this.getVerticalAlignmentToOverlayY(),
-          offsetX: this.options$().offset
+          offsetX: offset
         });
         break;
       case 'left':
@@ -322,7 +315,7 @@ export class PopoverComponent implements OnInit, OnDestroy {
           originY: this.getVerticalAlignmentToOverlayY(),
           overlayX: 'end',
           overlayY: this.getVerticalAlignmentToOverlayY(),
-          offsetX: this.options$().offset
+          offsetX: offset
         });
         break;
       case 'bottom':
@@ -332,14 +325,14 @@ export class PopoverComponent implements OnInit, OnDestroy {
           originY: 'bottom',
           overlayX,
           overlayY: 'top',
-          offsetY: this.options$().offset
+          offsetY: offset
         });
         break;
     }
 
     positions.push(
-      { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', offsetY: this.options$().offset },
-      { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', offsetY: this.options$().offset }
+      { originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', offsetY: offset },
+      { originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', offsetY: offset }
     );
 
     return this.overlay.position()
@@ -349,17 +342,13 @@ export class PopoverComponent implements OnInit, OnDestroy {
   }
 
   private getVerticalAlignmentToOverlayY(): TYPE_VERTICAL_ALIGNMENT {
-    switch (this.options$().arrowAlignment) {
-      case 'start': {
-        return 'top'
-      }
-
-      case 'end': {
-        return 'bottom';
-      }
-
-      default:
-        return 'center';
+    const { arrowAlignment } = this.options$() || {};
+    const alignmentObj: Record<TYPE_ARROW_ALIGNMENT, TYPE_VERTICAL_ALIGNMENT> = {
+      start: 'top',
+      end: 'bottom',
+      center: 'center'
     }
+
+    return alignmentObj[arrowAlignment as TYPE_ARROW_ALIGNMENT] || 'center';
   }
 }
