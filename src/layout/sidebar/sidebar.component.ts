@@ -34,7 +34,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   protected readonly chevronDownIcon = ChevronDownIcon;
 
   protected popoverOptions = signal<IPopoverOptions>(this.getPopoverOptions());
-  protected sideCollapsed = signal<boolean>(true);
+  protected sideCollapsed = signal<boolean>(false);
   protected menus = signal<IMenuItem[]>(this.buildMenus());
   protected menuActive = signal<IMenuItem | undefined>(undefined);
   protected popoverControls = signal<Map<string, IPopoverFunctionControl>>(new Map());
