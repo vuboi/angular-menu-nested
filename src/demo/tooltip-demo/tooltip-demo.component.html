@@ -1,0 +1,27 @@
+<div class="w-full h-full bg-gray-700 p-4 flex gap-3">
+  <h1 class="text-xl font-semibold mb-4 text-white">Tooltip Demo</h1>
+
+  <app-tooltip
+    [config]="{ position: 'top', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget', classStr: 'text-red-500 w-[200px]' }">
+    <button class="px-4 py-2 bg-blue-500 text-white rounded mr-4">Hover me</button>
+  </app-tooltip>
+
+
+  <app-tooltip
+    [config]="{ position: 'top', content: tooltipContent}">
+    <button class="px-4 py-2 bg-green-500 text-white rounded">Hover me</button>
+  </app-tooltip>
+  <ng-template #tooltipContent>
+    <div class="bg-gray-800 text-white p-2 rounded w-32">
+      <p>This is a tooltip with custom content!</p>
+    </div>
+  </ng-template>
+
+  <!-- Demo tooltip has text ellipsis -->
+  <app-tooltip
+    [config]="{ position: 'right', content: 'Tooltip on top', alwayShow: false }">
+    <button class="px-4 py-2 bg-red-500 text-white rounded">
+      <p class="w-32 truncate">This is a long text that will be truncated with ellipsis.</p>
+    </button>
+  </app-tooltip>
+</div>

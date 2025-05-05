@@ -45,6 +45,10 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('src/demo/popover-demo/popover-demo.component').then(m => m.PopoverDemoComponent),
       },
       {
+        path: RoutesConstant.TOOLTIP_DEMO,
+        loadComponent: () => import('src/demo/tooltip-demo/tooltip-demo.component').then(m => m.TooltipDemoComponent),
+      },
+      {
         path: '**',
         loadComponent: () => import('src/pages/404/404.component').then(m => m.Page404Component),
       }

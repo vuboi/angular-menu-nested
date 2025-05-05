@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { PopoverComponent } from "src/shared/components/popover";
 import { IPopoverFunctionControl } from "src/shared/components/popover/interfaces";
+import { PopoverComponent } from "src/shared/components/popover/popover.component";
 
 @Component({
   selector: "app-popover-demo",

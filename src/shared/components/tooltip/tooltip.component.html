@@ -1,0 +1,20 @@
+<!-- Template for string content -->
+<ng-template #tooltipContent>
+  <div [class]="'tooltip-content ' + config().classContent">
+    @if (config().showArrow) {
+      <div class="tooltip-arrow"></div>
+    }
+
+    @if (tooltipStr()) {
+      <div [class]="'tooltip-text text-sm ' + config().classStr">{{ tooltipStr() }}</div>
+    }
+
+    @if (tooltipTemplate()) {
+      <ng-container *ngTemplateOutlet="tooltipTemplate()" />
+    }
+  </div>
+</ng-template>
+
+<div #tooltipTrigger>
+  <ng-content></ng-content>
+</div>

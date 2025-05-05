@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal }
 import { Router, RouterModule } from "@angular/router";
 import { ChevronDownIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, LucideAngularModule } from "lucide-angular";
 import { explicitEffect } from 'ngxtension/explicit-effect';
+import { PopoverComponent } from "src/shared/components/popover/popover.component";
 import { uuid } from "src/shared/helpers";
-import { PopoverComponent } from "../../shared/components/popover";
 import { IPopoverFunctionControl, IPopoverOptions } from "../../shared/components/popover/interfaces";
 import { sidebarMenu } from "./defines/sidebar.define";
 import { IMenuItem } from "./interfaces/sidebar.interface";

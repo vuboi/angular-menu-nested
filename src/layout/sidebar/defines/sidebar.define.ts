@@ -81,5 +81,11 @@ export const sidebarMenu = (): IMenuItem[] => {
       icon: ChartColumnIcon,
       path: RoutesConstant.POPOVER_DEMO,
     },
+    {
+      id: '1abcz343368xx',
+      name: 'Tooltip Demo',
+      icon: ChartColumnIcon,
+      path: RoutesConstant.TOOLTIP_DEMO,
+    }
   ]
 }

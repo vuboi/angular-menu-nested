@@ -1,0 +1,111 @@
+:host {
+  display: inline-block;
+}
+
+::ng-deep {
+  .tooltip-content {
+    @apply bg-[hsl(240_10%_10%)] rounded-md shadow-lg py-2 px-3 border border-[#333] relative text-gray-200;
+    z-index: 1000;
+    min-width: 50px;
+
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-timing);
+    animation-fill-mode: forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+
+    &.position-bottom {
+      animation-name: slideInFromBottom;
+
+      &.closing {
+        animation-name: slideOutToBottom;
+      }
+    }
+
+    &.position-top {
+      animation-name: slideInFromTop;
+
+      &.closing {
+        animation-name: slideOutToTop;
+      }
+    }
+
+    &.position-right {
+      animation-name: slideInFromRight;
+
+      &.closing {
+        animation-name: slideOutToRight;
+      }
+    }
+
+    &.position-left {
+      animation-name: slideInFromLeft;
+
+      &.closing {
+        animation-name: slideOutToLeft;
+      }
+    }
+
+    &.has-arrow .tooltip-arrow {
+      @apply absolute w-0 h-0;
+      border-style: solid;
+      border-width: 6px;
+      z-index: 999;
+    }
+
+    &.position-top .tooltip-arrow {
+      @apply bottom-[-11px] left-1/2 -translate-x-1/2;
+      border-color: hsl(240 10% 10%) transparent transparent transparent;
+    }
+
+    &.position-right .tooltip-arrow {
+      @apply left-[-11px] top-1/2 -translate-y-1/2;
+      border-color: transparent hsl(240 10% 10%) transparent transparent;
+    }
+
+    &.position-bottom .tooltip-arrow {
+      @apply top-[-11px] left-1/2 -translate-x-1/2;
+      border-color: transparent transparent hsl(240 10% 10%) transparent;
+    }
+
+    &.position-left .tooltip-arrow {
+      @apply right-[-11px] top-1/2 -translate-y-1/2;
+      border-color: transparent transparent transparent hsl(240 10% 10%);
+    }
+
+    // Alignment adjustments for edge cases
+    &.align-start {
+
+      &.position-top .tooltip-arrow,
+      &.position-bottom .tooltip-arrow {
+        left: 20px;
+        transform: none;
+      }
+
+      &.position-left .tooltip-arrow,
+      &.position-right .tooltip-arrow {
+        top: 20px;
+        transform: none;
+      }
+    }
+
+    &.align-end {
+
+      &.position-top .tooltip-arrow,
+      &.position-bottom .tooltip-arrow {
+        left: auto;
+        right: 20px;
+        transform: none;
+      }
+
+      &.position-left .tooltip-arrow,
+      &.position-right .tooltip-arrow {
+        top: auto;
+        bottom: 20px;
+        transform: none;
+      }
+    }
+  }
+}

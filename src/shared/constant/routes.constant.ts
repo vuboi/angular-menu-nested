@@ -10,4 +10,5 @@ export class RoutesConstant {
   public static readonly USER_DETAIL = 'user-detail';
   public static readonly CATEGORY_DETAIL = 'category-detail';
   public static readonly POPOVER_DEMO = 'popover-demo';
+  public static readonly TOOLTIP_DEMO = 'tooltip-demo';
 }
