@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import { IPopoverFunctionControl } from "src/shared/components/popover/interfaces";
 import { PopoverComponent } from "src/shared/components/popover/popover.component";
 
@@ -12,16 +12,33 @@ import { PopoverComponent } from "src/shared/components/popover/popover.componen
   ],
 })
 export class PopoverDemoComponent {
-  private functionControlPopover: IPopoverFunctionControl | undefined;
+  private functionControlPopover = signal<IPopoverFunctionControl | null>(null);
+  private customPopoverControl = signal<IPopoverFunctionControl | null>(null);
 
   constructor() { }
 
   protected handlerFunctionControl(event: IPopoverFunctionControl): void {
-    this.functionControlPopover = event;
+    this.functionControlPopover.set(event);
   }
 
-  protected handlerClosePopover(event: Event): void {
+  protected handlerCustomPopoverControl(event: IPopoverFunctionControl): void {
+    this.customPopoverControl.set(event);
+  }
+
+  protected openPopover(): void {
+    this.functionControlPopover()?.openPopover();
+  }
+
+  protected closePopover(): void {
+    this.functionControlPopover()?.closePopover();
+  }
+
+  protected togglePopover(): void {
+    this.functionControlPopover()?.togglePopover();
+  }
+
+  protected closeCustomPopover(event: Event): void {
     event.stopPropagation();
-    this.functionControlPopover?.closePopover();
+    this.customPopoverControl()?.closePopover();
   }
 }

@@ -10,7 +10,9 @@ export const DEFAULT_TOOLTIP_CONFIG = (): ITooltipConfig => {
     disableClose: false,
     timeout: 100,
     alwayShow: true,
+    classContainer: '',
     classContent: '',
-    classStr: '',
+    classTrigger: '',
+    disabled: false,
   }
 }

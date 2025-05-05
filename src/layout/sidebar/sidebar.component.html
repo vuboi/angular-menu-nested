@@ -36,6 +36,7 @@
   @let menuLevel = menu.level;
 
   <app-popover
+    [classOrigin]="'!w-full'"
     [classContent]="'min-h-[50px] w-[250px]'"
     [options]="popoverOptions()"
     (functionControl)="handlerFunctionControl(menu.id, $event)">
@@ -54,18 +55,16 @@
   }
   </div>
 
-  <app-popover [options]="{ trigger: 'hover', position: 'right', disabledOpen: !sideCollapsed() }"
-    [classContent]="'w-fit'">
-    @if (sideCollapsed()) {
-      <div popoverContent>
-        <span
-          class="whitespace-nowrap text-ellipsis text-sm font-medium overflow-hidden transition-[width] duration-150 group-hover:text-white"
-          [class.w-0]="sideCollapsed()"
-          [class.w-[168px]]="!sideCollapsed()">
-          {{ menu.name }}
-        </span>
-      </div>
-    }
+  <app-tooltip [config]="{
+      content: menuName,
+      position: 'right',
+      showArrow: true,
+      classContainer: 'text-[14px] !p-[8px]',
+      classTrigger: 'w-full',
+      offset: 5,
+      disabled: !sideCollapsed()
+     }"
+    [class]="'w-full'">
     <div #menuItemRef
       class="menu-item rounded-md mt-2 mx-2 h-9 flex items-center text-gray-400 hover:text-white cursor-pointer overflow-hidden group relative"
       [class.bg-blue-600]="menuActive"
@@ -74,6 +73,16 @@
       [class.hidden]="menuHidden || sideCollapsed() && menuLevel! > 1"
       [attr.data-level]="menuLevel"
       (click)="handlerClickMenuItem($event, menu); handlerToggleMenuPopover($event, menu)">
+      <!-- Menu Name TemplateRef -->
+      <ng-template #menuName>
+        <span
+          class="whitespace-nowrap font-medium text-ellipsis overflow-hidden transition-[width] duration-150 group-hover:text-white"
+          [class.w-0]="sideCollapsed()"
+          [class.w-[168px]]="!sideCollapsed()">
+          {{ menu.name }}
+        </span>
+      </ng-template>
+
       <!-- Icon -->
       <div class="w-12 flex items-center justify-center flex-shrink-0">
         <i-lucide [name]="menu.icon"
@@ -102,7 +111,7 @@
         </div>
       }
     </div>
-  </app-popover>
+  </app-tooltip>
 
 
   <!-- Submenu Container -->

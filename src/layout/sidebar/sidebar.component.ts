@@ -4,6 +4,7 @@ import { Router, RouterModule } from "@angular/router";
 import { ChevronDownIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, LucideAngularModule } from "lucide-angular";
 import { explicitEffect } from 'ngxtension/explicit-effect';
 import { PopoverComponent } from "src/shared/components/popover/popover.component";
+import { TooltipComponent } from "src/shared/components/tooltip/tooltip.component";
 import { uuid } from "src/shared/helpers";
 import { IPopoverFunctionControl, IPopoverOptions } from "../../shared/components/popover/interfaces";
 import { sidebarMenu } from "./defines/sidebar.define";
@@ -21,7 +22,8 @@ import { CalculatorMaxHeightSubMenuPipe } from "./pipes/calculator-max-height-su
     NgTemplateOutlet,
     LucideAngularModule,
     PopoverComponent,
-    CalculatorMaxHeightSubMenuPipe
+    CalculatorMaxHeightSubMenuPipe,
+    TooltipComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

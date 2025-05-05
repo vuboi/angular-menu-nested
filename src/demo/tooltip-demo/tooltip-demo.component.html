@@ -66,16 +66,28 @@
               <td class="px-4 py-3">If true, tooltip always shows on hover. If false, tooltip only shows when text has ellipsis.</td>
             </tr>
             <tr class="border-b border-gray-600">
-              <td class="px-4 py-3 font-medium">classContent</td>
+              <td class="px-4 py-3 font-medium">classContainer</td>
               <td class="px-4 py-3">string</td>
               <td class="px-4 py-3">''</td>
               <td class="px-4 py-3">Additional CSS classes to apply to the tooltip container.</td>
             </tr>
             <tr>
-              <td class="px-4 py-3 font-medium">classStr</td>
+              <td class="px-4 py-3 font-medium">classContent</td>
               <td class="px-4 py-3">string</td>
               <td class="px-4 py-3">''</td>
               <td class="px-4 py-3">Additional CSS classes to apply to the tooltip text content.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium">classTrigger</td>
+              <td class="px-4 py-3">string</td>
+              <td class="px-4 py-3">''</td>
+              <td class="px-4 py-3">Additional CSS classes to apply to the trigger element.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium">disabled</td>
+              <td class="px-4 py-3">boolean</td>
+              <td class="px-4 py-3">false</td>
+              <td class="px-4 py-3">If true, the tooltip will not be displayed.</td>
             </tr>
           </tbody>
         </table>
@@ -174,7 +186,7 @@
         <div class="bg-gray-600 p-4 rounded-lg">
           <h3 class="text-lg font-medium mb-3 text-white">Long Text</h3>
           <app-tooltip
-            [config]="{ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nisl nisl ultricies nisl, eget aliquam ultricies nisl.', position: 'bottom', classStr: 'max-w-xs' }">
+            [config]="{ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nisl nisl ultricies nisl, eget aliquam ultricies nisl.', position: 'bottom', classContent: 'max-w-xs' }">
             <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">
               Hover for long text
             </button>
@@ -254,8 +266,8 @@
           <app-tooltip [config]="{
             content: 'This tooltip has custom styling',
             position: 'top',
-            classContent: 'bg-blue-900 border-blue-700',
-            classStr: 'text-blue-200 font-medium'
+            classContainer: 'bg-blue-900 border-blue-700',
+            classContent: 'text-blue-200 font-medium'
           }">
             <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
               Custom style

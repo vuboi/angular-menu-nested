@@ -50,6 +50,7 @@ export class TooltipComponent implements AfterViewInit, OnDestroy, OnInit {
     this.emitFunctionControl();
   }
 
+
   ngAfterViewInit(): void {
     fromEvent(this.tooltipTrigger().nativeElement, 'mouseenter').pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.handleShowTooltip());
@@ -74,6 +75,10 @@ export class TooltipComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   private showTooltipControl(): void {
+    if (this.config().disabled) {
+      return;
+    }
+
     this.openTooltipWithControl.set(true);
     this.handleShowTooltip();
     this.hideTooltipWhenClickOutside();
@@ -156,44 +161,54 @@ export class TooltipComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   private autoAdjustArrowAlignment(positionCurrent?: string): void {
-    if (!this.overlayRef()) {
+    if (!this.overlayRef() || !this.tooltipElement()) {
+      return;
+    }
+
+    const tooltipElement = this.tooltipElement();
+    const triggerRect = this.tooltipTrigger().nativeElement.getBoundingClientRect();
+    const tooltipRect = tooltipElement.getBoundingClientRect();
+    const position = positionCurrent || this.config().position;
+
+    tooltipElement.classList.remove('align-start', 'align-end');
+    if ((position === 'left' || position === 'right') && tooltipRect.height < 60) {
+      tooltipElement.classList.add('align-center');
+      return;
+    }
+
+    if ((position === 'top' || position === 'bottom') && tooltipRect.width < 60) {
+      tooltipElement.classList.add('align-center');
       return;
     }
 
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const triggerRect = this.tooltipTrigger().nativeElement.getBoundingClientRect();
     const edgeThreshold = 50;
-    const position = positionCurrent || this.config().position;
 
     if (position === 'top' || position === 'bottom') {
-      this.tooltipElement().classList.remove('align-start', 'align-end');
       if (triggerRect.right > viewportWidth - edgeThreshold) {
-        this.tooltipElement().classList.add('align-end');
-        return;
+        tooltipElement.classList.add('align-end');
       }
 
       if (triggerRect.left < edgeThreshold) {
-        this.tooltipElement().classList.add('align-start');
+        tooltipElement.classList.add('align-start');
       }
     }
 
     if (position === 'left' || position === 'right') {
-      this.tooltipElement().classList.remove('align-start', 'align-end');
       if (triggerRect.bottom > viewportHeight - edgeThreshold) {
-        this.tooltipElement().classList.add('align-end');
-        return;
+        tooltipElement.classList.add('align-end');
       }
 
       if (triggerRect.top < edgeThreshold) {
-        this.tooltipElement().classList.add('align-start');
+        tooltipElement.classList.add('align-start');
       }
     }
   }
 
   private handleShowTooltip(): void {
-    const { content, position, alwayShow } = this.config() || {};
-    if (this.overlayRef() || !alwayShow && !this.hasTextEllipsis()) {
+    const { content, position, alwayShow, disabled } = this.config() || {};
+    if (this.overlayRef() || !alwayShow && !this.hasTextEllipsis() || disabled) {
       return;
     }
 

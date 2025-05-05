@@ -10,8 +10,10 @@ export interface ITooltipConfig {
   disableClose?: boolean;
   timeout?: number;  // Delay before tooltip closes when mouse leave
   alwayShow?: boolean; // If true, tooltip alway show when hover, if false, tooltip only show tooltip when hover and text ellipsis
+  classContainer?: string;
   classContent?: string;
-  classStr?: string;
+  classTrigger?: string;
+  disabled?: boolean;
 }
 
 export interface ITooltipFunctionControl {

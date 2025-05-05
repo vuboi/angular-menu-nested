@@ -30,7 +30,6 @@ export class PopoverComponent implements OnInit, OnDestroy {
   private closeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   private overlay = inject(Overlay);
-  private elementRef = inject(ElementRef);
   private viewContainerRef = inject(ViewContainerRef);
   private destroyRef = inject(DestroyRef);
 
@@ -286,7 +285,7 @@ export class PopoverComponent implements OnInit, OnDestroy {
 
   private getPositionStrategy(): FlexibleConnectedPositionStrategy {
     const positions: ConnectionPositionPair[] = [];
-    const originElement = this.popoverOrigin()?.nativeElement || this.elementRef.nativeElement;
+    const originElement = this.popoverOrigin()?.nativeElement;
     const { position, arrowAlignment, offset } = this.options$() || {};
     const originX = arrowAlignment === 'start' ? 'start' : arrowAlignment === 'end' ? 'end' : 'center';
     const overlayX = arrowAlignment === 'start' ? 'start' : arrowAlignment === 'end' ? 'end' : 'center';
