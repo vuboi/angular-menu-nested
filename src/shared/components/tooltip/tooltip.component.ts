@@ -1,34 +1,37 @@
-import { ConnectedOverlayPositionChange, ConnectionPositionPair, Overlay, OverlayRef } from "@angular/cdk/overlay";
+import { ConnectedOverlayPositionChange, ConnectionPositionPair, FlexibleConnectedPositionStrategy, Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
-import { CommonModule } from "@angular/common";
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, input, signal, TemplateRef, viewChild, ViewContainerRef } from "@angular/core";
+import { NgTemplateOutlet } from "@angular/common";
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, input, OnDestroy, OnInit, output, signal, TemplateRef, viewChild, ViewContainerRef } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { explicitEffect } from "ngxtension/explicit-effect";
-import { fromEvent, Subscription, timer } from "rxjs";
+import { fromEvent, Subscription, throttleTime, timer } from "rxjs";
 import { DEFAULT_TOOLTIP_CONFIG } from "./defines/tooltip.define";
-import { ITooltipConfig } from "./interfaces/tooltip.interface";
+import { ITooltipConfig, ITooltipFunctionControl, TYPE_TOOLTIP_POSITION } from "./interfaces/tooltip.interface";
 
 @Component({
   selector: "app-tooltip",
   templateUrl: "./tooltip.component.html",
   styleUrl: "./tooltip.component.scss",
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TooltipComponent implements AfterViewInit {
+export class TooltipComponent implements AfterViewInit, OnDestroy, OnInit {
   public config = input<ITooltipConfig, ITooltipConfig>(DEFAULT_TOOLTIP_CONFIG(), {
     transform: (config) => {
       this.getTooltipContent(config);
       return { ...DEFAULT_TOOLTIP_CONFIG(), ...config };
     }
   });
+  public functionControl = output<ITooltipFunctionControl>();
 
   protected tooltipStr = signal<string>('');
   protected tooltipTemplate = signal<TemplateRef<unknown> | null>(null);
-  private subHiddenTooltip: Subscription | null = null;
+  private subscriptions = new Subscription();
   private overlayRef = signal<OverlayRef | null>(null);
   private hasTextEllipsis = signal<boolean>(false);
+  private openTooltipWithControl = signal<boolean>(false);
+  private tooltipElement = computed(() => this.overlayRef()?.overlayElement.querySelector('.tooltip-content') as HTMLElement)
 
   private overlay = inject(Overlay);
   private viewContainerRef = inject(ViewContainerRef);
@@ -38,36 +41,45 @@ export class TooltipComponent implements AfterViewInit {
   private tooltipTrigger = viewChild.required<ElementRef>('tooltipTrigger');
 
   constructor() {
-    explicitEffect([this.overlayRef], ([overlayRef]) =>
-      this.setupTooltipHoverListeners(overlayRef)
+    explicitEffect([this.overlayRef], () =>
+      this.setupTooltipHoverListeners()
     );
   }
 
+  ngOnInit(): void {
+    this.emitFunctionControl();
+  }
+
   ngAfterViewInit(): void {
-    fromEvent(this.tooltipTrigger().nativeElement, 'mouseenter')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.clearSubHiddenTimeout();
-        this.handleShowTooltip();
-      });
+    fromEvent(this.tooltipTrigger().nativeElement, 'mouseenter').pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.handleShowTooltip());
 
-    fromEvent(this.tooltipTrigger().nativeElement, 'mouseleave')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.overlayRef()) {
-          this.scheduleHideTooltip();
-        }
-      });
+    fromEvent(this.tooltipTrigger().nativeElement, 'mouseleave').pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.scheduleRemoveTooltip());
 
-    fromEvent(window, 'resize')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.overlayRef()) {
-          this.autoAdjustArrowAlignment(this.overlayRef()?.overlayElement.querySelector('.tooltip-content') as HTMLElement);
-        }
-      });
+    fromEvent(window, 'resize').pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.autoAdjustArrowAlignment());
 
-    this.checkForTextEllipsis(this.tooltipTrigger().nativeElement);
+    this.checkForTextEllipsis();
+    this.hideTooltipWhenScroll();
+  }
+
+  private emitFunctionControl(): void {
+    this.functionControl.emit({
+      showTooltip: this.showTooltipControl.bind(this),
+      hideTooltip: this.handleHideTooltip.bind(this),
+      updatePosition: (position: TYPE_TOOLTIP_POSITION) =>
+        this.updateTooltipPosition(undefined, position, true)
+    });
+  }
+
+  private showTooltipControl(): void {
+    this.openTooltipWithControl.set(true);
+    this.handleShowTooltip();
+    this.hideTooltipWhenClickOutside();
+    timer(100).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.openTooltipWithControl.set(false));
+
   }
 
   private getTooltipContent(config: ITooltipConfig): void {
@@ -81,149 +93,238 @@ export class TooltipComponent implements AfterViewInit {
     this.tooltipTemplate.set(config.content as TemplateRef<unknown>);
   }
 
-  private clearSubHiddenTimeout(): void {
-    if (this.subHiddenTooltip) {
-      this.subHiddenTooltip.unsubscribe();
-      this.subHiddenTooltip = null;
-    }
-  }
 
-  private scheduleHideTooltip(): void {
-    this.clearSubHiddenTimeout();
+  private scheduleRemoveTooltip(): void {
     const { timeout = 0, disableClose } = this.config() || {};
-    if (disableClose) {
+    if (disableClose || !this.overlayRef()) {
       return;
     }
 
     if (timeout > 0) {
-      this.subHiddenTooltip = timer(timeout)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
-          this.handleHideTooltip();
-        });
+      const hideSubscription = timer(timeout).pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.handleHideTooltip());
+      this.subscriptions.add(hideSubscription);
       return;
     }
 
     this.handleHideTooltip();
   }
 
-  private setupTooltipHoverListeners(overlayRef: OverlayRef | null): void {
-    if (overlayRef === null) {
+  private setupTooltipHoverListeners(): void {
+    if (!this.tooltipElement()) {
       return;
     }
 
-    const tooltipElement = this.overlayRef()?.overlayElement.querySelector('.tooltip-content');
-    if (!tooltipElement) {
-      return;
-    }
-
-    const mouseEnter$ = fromEvent<MouseEvent>(tooltipElement, 'mouseenter')
+    const mouseEnter$ = fromEvent<MouseEvent>(this.tooltipElement(), 'mouseenter')
       .pipe(takeUntilDestroyed(this.destroyRef));
-    const mouseLeave$ = fromEvent<MouseEvent>(tooltipElement, 'mouseleave')
+    const mouseLeave$ = fromEvent<MouseEvent>(this.tooltipElement(), 'mouseleave')
       .pipe(takeUntilDestroyed(this.destroyRef));
 
     const mouseEnterSubscription = mouseEnter$.subscribe(() => {
-      this.clearSubHiddenTimeout();
       mouseEnterSubscription.unsubscribe();
     });
 
     const mouseLeaveSubscription = mouseLeave$.subscribe(() => {
-      this.scheduleHideTooltip();
+      this.scheduleRemoveTooltip();
       mouseLeaveSubscription.unsubscribe();
     });
   }
 
-  private setTooltipClasses(tooltipElement: HTMLElement, positionCurrent?: string): void {
-    const { position, showArrow, zIndex } = this.config() || {};
-    const _position = () => {
-      if (positionCurrent === 'end') {
-        positionCurrent = 'right';
-      }
-      if (positionCurrent === 'start') {
-        positionCurrent = 'left';
-      }
-      return positionCurrent || position;
-    };
+  private setTooltipClasses(positionCurrent?: TYPE_TOOLTIP_POSITION): void {
+    if (!this.tooltipElement()) {
+      return;
+    }
 
-    const zIndexClass = `z-${zIndex}`;
-    tooltipElement.classList.add(zIndexClass);
-    const classList = tooltipElement.classList;
+    const { position: positionConfig, showArrow, zIndex } = this.config() || {};
+    const position = positionCurrent || positionConfig;
+    const classList = this.tooltipElement().classList;
     classList.forEach((className) => {
       if (['position-top', 'position-bottom', 'position-left', 'position-right'].includes(className)) {
         classList.remove(className);
       }
     });
 
-    tooltipElement.classList.add(`position-${_position()}`);
+    this.tooltipElement().classList.add(`position-${position}`);
+    const zIndexClass = `z-${zIndex}`;
+    this.tooltipElement().classList.add(zIndexClass);
 
     if (showArrow) {
-      tooltipElement.classList.add('has-arrow');
+      this.tooltipElement().classList.add('has-arrow');
     }
 
-    this.autoAdjustArrowAlignment(tooltipElement, positionCurrent);
+    this.autoAdjustArrowAlignment(positionCurrent);
   }
 
-  private autoAdjustArrowAlignment(tooltipElement: HTMLElement, positionCurrent?: string): void {
+  private autoAdjustArrowAlignment(positionCurrent?: string): void {
+    if (!this.overlayRef()) {
+      return;
+    }
+
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const triggerRect = this.tooltipTrigger().nativeElement.getBoundingClientRect();
-    const tooltipRect = tooltipElement.getBoundingClientRect();
     const edgeThreshold = 50;
     const position = positionCurrent || this.config().position;
 
     if (position === 'top' || position === 'bottom') {
-      const arrowElement = tooltipElement.querySelector('.tooltip-arrow') as HTMLElement;
-      if (!arrowElement) return;
-
-      const triggerCenter = triggerRect.left + (triggerRect.width / 2);
-      const tooltipLeft = tooltipRect.left;
-      const arrowPosition = triggerCenter - tooltipLeft;
-      const minPosition = 12;
-      const maxPosition = tooltipRect.width - 12;
-      const constrainedPosition = Math.max(minPosition, Math.min(arrowPosition, maxPosition));
-      arrowElement.style.left = `${constrainedPosition}px`;
-
-      tooltipElement.classList.remove('align-start', 'align-end');
+      this.tooltipElement().classList.remove('align-start', 'align-end');
       if (triggerRect.right > viewportWidth - edgeThreshold) {
-        tooltipElement.classList.add('align-end');
+        this.tooltipElement().classList.add('align-end');
         return;
       }
 
       if (triggerRect.left < edgeThreshold) {
-        tooltipElement.classList.add('align-start');
+        this.tooltipElement().classList.add('align-start');
       }
     }
 
     if (position === 'left' || position === 'right') {
-      const arrowElement = tooltipElement.querySelector('.tooltip-arrow') as HTMLElement;
-      if (!arrowElement) return;
-
-      const triggerCenter = triggerRect.top + (triggerRect.height / 2);
-      const tooltipTop = tooltipRect.top;
-      const arrowPosition = triggerCenter - tooltipTop;
-      const minPosition = 12;
-      const maxPosition = tooltipRect.height - 12;
-      const constrainedPosition = Math.max(minPosition, Math.min(arrowPosition, maxPosition));
-      arrowElement.style.top = `${constrainedPosition}px`;
-
-      tooltipElement.classList.remove('align-start', 'align-end');
+      this.tooltipElement().classList.remove('align-start', 'align-end');
       if (triggerRect.bottom > viewportHeight - edgeThreshold) {
-        tooltipElement.classList.add('align-end');
+        this.tooltipElement().classList.add('align-end');
         return;
       }
 
       if (triggerRect.top < edgeThreshold) {
-        tooltipElement.classList.add('align-start');
+        this.tooltipElement().classList.add('align-start');
       }
     }
   }
 
   private handleShowTooltip(): void {
-    const { content, position, offset = 0, alwayShow } = this.config() || {};
+    const { content, position, alwayShow } = this.config() || {};
     if (this.overlayRef() || !alwayShow && !this.hasTextEllipsis()) {
       return;
     }
 
+    const positions: ConnectionPositionPair[] = this.getPositionsForDirection(position as TYPE_TOOLTIP_POSITION);
+    const positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo(this.tooltipTrigger())
+      .withPositions(positions)
+      .withPush(true);
+
+    positionStrategy.positionChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => this.updateTooltipPosition(event));
+
+    const overlayConfig = {
+      positionStrategy,
+      hasBackdrop: false,
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+    };
+
+    this.overlayRef.set(this.overlay.create(overlayConfig));
+
+    if (typeof content === "string") {
+      const tooltipPortal = new TemplatePortal(this.tooltipContent(), this.viewContainerRef);
+      this.overlayRef()?.attach(tooltipPortal);
+      return;
+    }
+
+    if (content instanceof TemplateRef) {
+      const tooltipPortal = new TemplatePortal(this.tooltipContent(), this.viewContainerRef);
+      this.overlayRef()?.attach(tooltipPortal);
+    }
+  }
+
+  private hideTooltipWhenClickOutside(): void {
+    timer(0)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const clickSubscription = fromEvent<MouseEvent>(document, 'click')
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((event) => {
+            if (!this.overlayRef()) {
+              clickSubscription.unsubscribe();
+              return;
+            }
+
+            if (this.openTooltipWithControl()) {
+              return;
+            }
+
+            const tooltipElement = this.tooltipElement();
+            const triggerElement = this.tooltipTrigger()?.nativeElement;
+            const clickedInside = tooltipElement?.contains(event.target as Node) || triggerElement?.contains(event.target as Node);
+            if (!clickedInside && !this.config().disableClose) {
+              this.handleHideTooltip();
+              this.openTooltipWithControl.set(false);
+              clickSubscription.unsubscribe();
+            }
+          });
+      });
+  }
+
+  private hideTooltipWhenScroll(): void {
+    let element: HTMLElement | null = this.tooltipTrigger().nativeElement;
+    const scrollableParents: HTMLElement[] = [];
+
+    while (element) {
+      const style = window.getComputedStyle(element);
+      if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+        scrollableParents.push(element);
+      }
+      element = element.parentElement;
+    }
+
+    scrollableParents.push(document.documentElement);
+    scrollableParents.forEach(parent => {
+      fromEvent(parent, 'scroll')
+        .pipe(
+          throttleTime(1000),
+          takeUntilDestroyed(this.destroyRef))
+        .subscribe((e) => {
+          this.handleHideTooltip();
+        });
+    });
+  }
+
+  private updateTooltipPosition(event?: ConnectedOverlayPositionChange, position?: TYPE_TOOLTIP_POSITION, forceApply = false): void {
+    if (!this.overlayRef()) {
+      return;
+    }
+
+    if (forceApply) {
+      this.openTooltipWithControl.set(true);
+      const positionStrategy = this.overlayRef()?.getConfig().positionStrategy as FlexibleConnectedPositionStrategy;
+      if (positionStrategy && 'apply' in positionStrategy) {
+        void this.tooltipElement()?.offsetHeight;
+        const newPosition = (position || this.config().position) as TYPE_TOOLTIP_POSITION;
+        const positions: ConnectionPositionPair[] = this.getPositionsForDirection(newPosition);
+
+        if ('withPositions' in positionStrategy) {
+          positionStrategy.withPositions(positions);
+          positionStrategy.apply();
+          this.setTooltipClasses(newPosition);
+          this.autoAdjustArrowAlignment(newPosition);
+          const subUpdatePosition = timer(50)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+              this.openTooltipWithControl.set(false);
+              subUpdatePosition.unsubscribe();
+            });
+        }
+      }
+
+      return;
+    }
+
+    if (event) {
+      const { originX, originY } = event.connectionPair || {};
+      const positionOverlay = ['top', 'bottom'].includes(this.config().position || 'top') ? originY : originX;
+      const objPosition: Record<string, string> = { start: 'left', end: 'right' };
+      const positionCurrent = (objPosition[positionOverlay] || positionOverlay) as TYPE_TOOLTIP_POSITION;
+      this.setTooltipClasses(positionCurrent);
+      return;
+    }
+
+    this.setTooltipClasses(position || this.config().position);
+    this.autoAdjustArrowAlignment();
+  }
+
+  private getPositionsForDirection(position: TYPE_TOOLTIP_POSITION): ConnectionPositionPair[] {
+    const { offset = 0 } = this.config();
     const positions: ConnectionPositionPair[] = [];
 
     switch (position) {
@@ -310,61 +411,34 @@ export class TooltipComponent implements AfterViewInit {
         break;
     }
 
-    const positionStrategy = this.overlay
-      .position()
-      .flexibleConnectedTo(this.tooltipTrigger())
-      .withPositions(positions)
-      .withPush(true);
-
-    positionStrategy.positionChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((event: ConnectedOverlayPositionChange) => {
-        const { originX, originY } = event.connectionPair;
-        const tooltipContent = this.overlayRef()?.overlayElement.querySelector('.tooltip-content');
-        if (tooltipContent) {
-          const positionCurrent = ['top', 'bottom'].includes(this.config().position || 'top') ? originY : originX;
-          this.setTooltipClasses(tooltipContent as HTMLElement, positionCurrent);
-        }
-      });
-
-    const overlayConfig = {
-      positionStrategy,
-      hasBackdrop: false,
-      scrollStrategy: this.overlay.scrollStrategies.reposition(),
-    };
-
-    this.overlayRef.set(this.overlay.create(overlayConfig));
-
-    if (typeof content === "string") {
-      const tooltipPortal = new TemplatePortal(this.tooltipContent(), this.viewContainerRef);
-      this.overlayRef()?.attach(tooltipPortal);
-      return;
-    }
-
-    if (content instanceof TemplateRef) {
-      const tooltipPortal = new TemplatePortal(this.tooltipContent(), this.viewContainerRef);
-      this.overlayRef()?.attach(tooltipPortal);
-    }
+    return positions;
   }
 
   private handleHideTooltip(): void {
-    if (this.overlayRef()) {
-      const tooltipContent = this.overlayRef()?.overlayElement.querySelector('.tooltip-content');
-      if (tooltipContent) {
-        tooltipContent.classList.add('closing');
-      }
-
-      timer(150)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
-          this.overlayRef()?.detach();
-          this.overlayRef()?.dispose();
-          this.overlayRef.set(null);
-        });
+    if (!this.overlayRef()) {
+      return;
     }
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
+
+    if (this.tooltipElement()) {
+      this.tooltipElement().classList.add('closing');
+    }
+
+    const closingSubscription = timer(150)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.overlayRef()?.detach();
+        this.overlayRef()?.dispose();
+        this.overlayRef.set(null);
+      });
+
+    this.subscriptions.add(closingSubscription);
   }
 
-  private checkForTextEllipsis(element: HTMLElement): void {
+  private checkForTextEllipsis(): void {
+    const element = this.tooltipTrigger().nativeElement;
     const targetElement = this.findTextElement(element);
     if (targetElement) {
       const isEllipsisActive = targetElement.offsetWidth < targetElement.scrollWidth;
@@ -381,11 +455,7 @@ export class TooltipComponent implements AfterViewInit {
     }
 
     const style = window.getComputedStyle(element);
-    if (
-      style.textOverflow === 'ellipsis' ||
-      style.overflow === 'hidden' ||
-      style.whiteSpace === 'nowrap'
-    ) {
+    if (style.textOverflow === 'ellipsis' || style.overflow === 'hidden' || style.whiteSpace === 'nowrap') {
       return element;
     }
 
@@ -398,5 +468,9 @@ export class TooltipComponent implements AfterViewInit {
     }
 
     return null;
+  }
+
+  ngOnDestroy(): void {
+    this.handleHideTooltip();
   }
 }

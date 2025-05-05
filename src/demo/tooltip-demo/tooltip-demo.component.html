@@ -1,27 +1,282 @@
-<div class="w-full h-full bg-gray-700 p-4 flex gap-3">
-  <h1 class="text-xl font-semibold mb-4 text-white">Tooltip Demo</h1>
+<div class="w-full h-full bg-gray-800 overflow-auto">
+  <div class="p-6">
+    <h1 class="text-2xl font-semibold mb-6 text-white">Tooltip Component</h1>
 
-  <app-tooltip
-    [config]="{ position: 'top', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget', classStr: 'text-red-500 w-[200px]' }">
-    <button class="px-4 py-2 bg-blue-500 text-white rounded mr-4">Hover me</button>
-  </app-tooltip>
+    <!-- Documentation Section -->
+    <div class="bg-gray-700 rounded-lg p-6 mb-8">
+      <h2 class="text-xl font-medium mb-4 text-white">Documentation</h2>
 
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-300">
+          <thead class="text-xs uppercase bg-gray-600">
+            <tr>
+              <th scope="col" class="px-4 py-3 rounded-l-lg">Property</th>
+              <th scope="col" class="px-4 py-3">Type</th>
+              <th scope="col" class="px-4 py-3">Default</th>
+              <th scope="col" class="px-4 py-3 rounded-r-lg">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">content</td>
+              <td class="px-4 py-3">string | TemplateRef</td>
+              <td class="px-4 py-3">'Tooltip content !!!'</td>
+              <td class="px-4 py-3">The content to display in the tooltip. Can be a string or a template reference.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">position</td>
+              <td class="px-4 py-3">'top' | 'right' | 'bottom' | 'left'</td>
+              <td class="px-4 py-3">'top'</td>
+              <td class="px-4 py-3">The position of the tooltip relative to the target element.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">showArrow</td>
+              <td class="px-4 py-3">boolean</td>
+              <td class="px-4 py-3">true</td>
+              <td class="px-4 py-3">Whether to show an arrow pointing to the target element.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">offset</td>
+              <td class="px-4 py-3">number</td>
+              <td class="px-4 py-3">8</td>
+              <td class="px-4 py-3">The distance between the tooltip and the target element in pixels.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">zIndex</td>
+              <td class="px-4 py-3">number</td>
+              <td class="px-4 py-3">1000</td>
+              <td class="px-4 py-3">The z-index of the tooltip.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">disableClose</td>
+              <td class="px-4 py-3">boolean</td>
+              <td class="px-4 py-3">false</td>
+              <td class="px-4 py-3">If true, the tooltip will not close when the mouse leaves the target.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">timeout</td>
+              <td class="px-4 py-3">number</td>
+              <td class="px-4 py-3">100</td>
+              <td class="px-4 py-3">The delay in milliseconds before the tooltip closes when the mouse leaves.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">alwayShow</td>
+              <td class="px-4 py-3">boolean</td>
+              <td class="px-4 py-3">true</td>
+              <td class="px-4 py-3">If true, tooltip always shows on hover. If false, tooltip only shows when text has ellipsis.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">classContent</td>
+              <td class="px-4 py-3">string</td>
+              <td class="px-4 py-3">''</td>
+              <td class="px-4 py-3">Additional CSS classes to apply to the tooltip container.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium">classStr</td>
+              <td class="px-4 py-3">string</td>
+              <td class="px-4 py-3">''</td>
+              <td class="px-4 py-3">Additional CSS classes to apply to the tooltip text content.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-  <app-tooltip
-    [config]="{ position: 'top', content: tooltipContent}">
-    <button class="px-4 py-2 bg-green-500 text-white rounded">Hover me</button>
-  </app-tooltip>
-  <ng-template #tooltipContent>
-    <div class="bg-gray-800 text-white p-2 rounded w-32">
-      <p>This is a tooltip with custom content!</p>
+      <h3 class="text-lg font-medium mt-6 mb-3 text-white">Function Controls</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-300">
+          <thead class="text-xs uppercase bg-gray-600">
+            <tr>
+              <th scope="col" class="px-4 py-3 rounded-l-lg">Method</th>
+              <th scope="col" class="px-4 py-3 rounded-r-lg">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">showTooltip()</td>
+              <td class="px-4 py-3">Programmatically shows the tooltip.</td>
+            </tr>
+            <tr class="border-b border-gray-600">
+              <td class="px-4 py-3 font-medium">hideTooltip()</td>
+              <td class="px-4 py-3">Programmatically hides the tooltip.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium">updatePosition(position)</td>
+              <td class="px-4 py-3">Updates the position of the tooltip. Position can be 'top', 'right', 'bottom', or 'left'.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </ng-template>
 
-  <!-- Demo tooltip has text ellipsis -->
-  <app-tooltip
-    [config]="{ position: 'right', content: 'Tooltip on top', alwayShow: false }">
-    <button class="px-4 py-2 bg-red-500 text-white rounded">
-      <p class="w-32 truncate">This is a long text that will be truncated with ellipsis.</p>
-    </button>
-  </app-tooltip>
+    <!-- Examples Section -->
+    <div class="bg-gray-700 rounded-lg p-6">
+      <h2 class="text-xl font-medium mb-4 text-white">Examples</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Basic Tooltip -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Basic Tooltip</h3>
+          <app-tooltip [config]="{ content: 'This is a basic tooltip', position: 'top' }">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+              Hover me
+            </button>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with Custom Content -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Custom Content</h3>
+          <app-tooltip [config]="{ position: 'right', content: tooltipContent }">
+            <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+              Hover me
+            </button>
+
+            <ng-template #tooltipContent>
+              <div class="text-white rounded w-48">
+                <h4 class="font-medium mb-1">Custom Tooltip</h4>
+                <p class="text-sm text-gray-300">This tooltip uses a template for custom content.</p>
+              </div>
+            </ng-template>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with Different Positions -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Different Positions</h3>
+          <div class="flex flex-wrap gap-2">
+            <app-tooltip [config]="{ content: 'Top tooltip', position: 'top' }">
+              <button class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
+                Top
+              </button>
+            </app-tooltip>
+
+            <app-tooltip [config]="{ content: 'Right tooltip', position: 'right' }">
+              <button class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
+                Right
+              </button>
+            </app-tooltip>
+
+            <app-tooltip [config]="{ content: 'Bottom tooltip', position: 'bottom' }">
+              <button class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
+                Bottom
+              </button>
+            </app-tooltip>
+
+            <app-tooltip [config]="{ content: 'Left tooltip', position: 'left' }">
+              <button class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
+                Left
+              </button>
+            </app-tooltip>
+          </div>
+        </div>
+
+        <!-- Tooltip with Long Text -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Long Text</h3>
+          <app-tooltip
+            [config]="{ content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nisl nisl ultricies nisl, eget aliquam ultricies nisl.', position: 'bottom', classStr: 'max-w-xs' }">
+            <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">
+              Hover for long text
+            </button>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with No Arrow -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">No Arrow</h3>
+          <app-tooltip [config]="{ content: 'This tooltip has no arrow', position: 'top', showArrow: false }">
+            <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+              No arrow
+            </button>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with Text Ellipsis -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Text Ellipsis</h3>
+          <app-tooltip [config]="{ content: 'This tooltip shows on text with ellipsis', position: 'bottom', alwayShow: false }">
+            <div class="w-32 truncate bg-gray-500 p-2 rounded">
+              This is a long text that will be truncated with ellipsis.
+            </div>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with Programmatic Control -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Programmatic Control</h3>
+          <div class="flex flex-col gap-2">
+            <app-tooltip
+              [config]="{ content: 'This tooltip update position!!', position: 'top' }"
+              (functionControl)="onFunctionControl($event)">
+              <button class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors">
+                Target element
+              </button>
+            </app-tooltip>
+
+            <div class="flex gap-2 mt-2 flex-wrap">
+              <button
+                class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                (click)="showTooltip()">
+                Show
+              </button>
+              <button
+                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                (click)="hideTooltip()">
+                Hide
+              </button>
+              <button
+                class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                (click)="updatePosition('right')">
+                Right
+              </button>
+              <button
+                class="px-3 py-1 bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+                (click)="updatePosition('bottom')">
+                Bottom
+              </button>
+              <button
+                class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                (click)="updatePosition('left')">
+                Left
+              </button>
+              <button
+                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                (click)="updatePosition('top')">
+                Top
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tooltip with Custom Styling -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Custom Styling</h3>
+          <app-tooltip [config]="{
+            content: 'This tooltip has custom styling',
+            position: 'top',
+            classContent: 'bg-blue-900 border-blue-700',
+            classStr: 'text-blue-200 font-medium'
+          }">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+              Custom style
+            </button>
+          </app-tooltip>
+        </div>
+
+        <!-- Tooltip with Delayed Close -->
+        <div class="bg-gray-600 p-4 rounded-lg">
+          <h3 class="text-lg font-medium mb-3 text-white">Delayed Close</h3>
+          <app-tooltip [config]="{
+            content: 'This tooltip will close after 2 seconds',
+            position: 'bottom',
+            timeout: 2000
+          }">
+            <button class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">
+              Delayed close
+            </button>
+          </app-tooltip>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

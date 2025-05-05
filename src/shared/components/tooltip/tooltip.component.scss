@@ -48,63 +48,167 @@
       }
     }
 
-    &.has-arrow .tooltip-arrow {
-      @apply absolute w-0 h-0;
-      border-style: solid;
-      border-width: 6px;
-      z-index: 999;
-    }
+    &.has-arrow {
 
-    &.position-top .tooltip-arrow {
-      @apply bottom-[-11px] left-1/2 -translate-x-1/2;
-      border-color: hsl(240 10% 10%) transparent transparent transparent;
-    }
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
 
-    &.position-right .tooltip-arrow {
-      @apply left-[-11px] top-1/2 -translate-y-1/2;
-      border-color: transparent hsl(240 10% 10%) transparent transparent;
-    }
+      &::before {
+        z-index: 998;
+      }
 
-    &.position-bottom .tooltip-arrow {
-      @apply top-[-11px] left-1/2 -translate-x-1/2;
-      border-color: transparent transparent hsl(240 10% 10%) transparent;
-    }
+      &::after {
+        z-index: 999;
+      }
 
-    &.position-left .tooltip-arrow {
-      @apply right-[-11px] top-1/2 -translate-y-1/2;
-      border-color: transparent transparent transparent hsl(240 10% 10%);
+      &.position-top {
+        &::before {
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 8px 8px 0 8px;
+          border-color: #333 transparent transparent transparent;
+        }
+
+        &::after {
+          bottom: -6px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 6px 6px 0 6px;
+          border-color: hsl(240 10% 10%) transparent transparent transparent;
+        }
+      }
+
+      &.position-right {
+        &::before {
+          left: -8px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 8px 8px 8px 0;
+          border-color: transparent #333 transparent transparent;
+        }
+
+        &::after {
+          left: -6px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 6px 6px 6px 0;
+          border-color: transparent hsl(240 10% 10%) transparent transparent;
+        }
+      }
+
+      &.position-bottom {
+        &::before {
+          top: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 0 8px 8px 8px;
+          border-color: transparent transparent #333 transparent;
+        }
+
+        &::after {
+          top: -6px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 0 6px 6px 6px;
+          border-color: transparent transparent hsl(240 10% 10%) transparent;
+        }
+      }
+
+      &.position-left {
+        &::before {
+          right: -8px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 8px 0 8px 8px;
+          border-color: transparent transparent transparent #333;
+        }
+
+        &::after {
+          right: -6px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 6px 0 6px 6px;
+          border-color: transparent transparent transparent hsl(240 10% 10%);
+        }
+      }
     }
 
     // Alignment adjustments for edge cases
     &.align-start {
 
-      &.position-top .tooltip-arrow,
-      &.position-bottom .tooltip-arrow {
-        left: 20px;
-        transform: none;
+      &.position-top,
+      &.position-bottom {
+        &::before {
+          left: 20px;
+          right: unset;
+          transform: translateX(0);
+        }
+
+        &::after {
+          left: 22px;
+          /* Điều chỉnh để căn chỉnh với ::before */
+          right: unset;
+          transform: translateX(0);
+        }
       }
 
-      &.position-left .tooltip-arrow,
-      &.position-right .tooltip-arrow {
-        top: 20px;
-        transform: none;
+      &.position-left,
+      &.position-right {
+        &::before {
+          top: 20px;
+          bottom: unset;
+          transform: translateY(0);
+        }
+
+        &::after {
+          top: 22px;
+          /* Điều chỉnh để căn chỉnh với ::before */
+          bottom: unset;
+          transform: translateY(0);
+        }
       }
     }
 
     &.align-end {
 
-      &.position-top .tooltip-arrow,
-      &.position-bottom .tooltip-arrow {
-        left: auto;
-        right: 20px;
-        transform: none;
+      &.position-top,
+      &.position-bottom {
+        &::before {
+          left: unset;
+          right: 20px;
+          transform: translateX(0);
+        }
+
+        &::after {
+          left: unset;
+          right: 22px;
+          /* Điều chỉnh để căn chỉnh với ::before */
+          transform: translateX(0);
+        }
       }
 
-      &.position-left .tooltip-arrow,
-      &.position-right .tooltip-arrow {
-        top: auto;
-        bottom: 20px;
-        transform: none;
+      &.position-left,
+      &.position-right {
+        &::before {
+          top: unset;
+          bottom: 20px;
+          transform: translateY(0);
+        }
+
+        &::after {
+          top: unset;
+          bottom: 22px;
+          /* Điều chỉnh để căn chỉnh với ::before */
+          transform: translateY(0);
+        }
       }
     }
   }

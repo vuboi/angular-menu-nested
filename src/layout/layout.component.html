@@ -3,10 +3,9 @@
   <app-sidebar />
 
   <!-- Main Content -->
-  <div class="flex-1 h-screen overflow-hidden">
+  <div class="flex-1 flex flex-col h-screen">
     <app-header />
-    <div class="h-full overflow-y-auto">
-      <!-- Header -->
+    <div class="flex-1 overflow-auto">
       <router-outlet />
     </div>
   </div>

@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #4b5563;
+  border-radius: 4px;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+}
+
+input[type="checkbox"] {
+  accent-color: #3b82f6;
+}

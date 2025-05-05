@@ -1,10 +1,5 @@
-<!-- Template for string content -->
 <ng-template #tooltipContent>
-  <div [class]="'tooltip-content ' + config().classContent">
-    @if (config().showArrow) {
-      <div class="tooltip-arrow"></div>
-    }
-
+  <div [class]="'tooltip-content ' + (config().showArrow ? 'has-arrow ' : '') + config().classContent">
     @if (tooltipStr()) {
       <div [class]="'tooltip-text text-sm ' + config().classStr">{{ tooltipStr() }}</div>
     }
@@ -15,6 +10,6 @@
   </div>
 </ng-template>
 
-<div #tooltipTrigger>
+<div #tooltipTrigger class="w-fit">
   <ng-content></ng-content>
 </div>
